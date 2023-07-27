@@ -17,5 +17,5 @@ resource "azurerm_subnet" "myterraformsubnet" {
   name                  = "test-subnet"
   resource_group_name   = azurerm_resource_group.test.name
   virtual_network_name  = "test-vnet"
-  address_prefixes      = "10.0.0.0/16"
+  address_prefixes      = ["10.0.0.0/16"]
 }
