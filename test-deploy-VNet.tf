@@ -22,7 +22,7 @@ provider "azurerm" {
 resource "azurerm_resource_group" "test" {
   name     = "test-VNet"
   location = "West US 2"
-  tags     = "updated"
+  tag      = "updated"
 }
 
 # Create a virtual network within the resource group
