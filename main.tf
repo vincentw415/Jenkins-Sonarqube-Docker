@@ -19,3 +19,5 @@ resource "azurerm_subnet" "myterraformsubnet" {
   virtual_network_name  = "test-vnet"
   address_prefixes      = ["10.0.0.0/16"]
 }
+
+test
