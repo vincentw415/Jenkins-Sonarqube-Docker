@@ -1,4 +1,4 @@
 variable "region" {
   description = "Azure region"
-  default     = "westus"
+  default     = "westus2"
 }
