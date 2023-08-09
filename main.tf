@@ -58,6 +58,9 @@ resource "azurerm_virtual_machine" "vm" {
     admin_username = "testadmin"
     admin_password = "Password1234!"
   }
+  os_profile_windows_config {
+    disable_password_authentication = false
+  }
 }
 
 # Create a test NSG for the subnet
