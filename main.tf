@@ -1,21 +1,82 @@
-# Create a resource group
-resource "azurerm_resource_group" "test" {
+# Create a resource group to test terraform deployments
+resource "azurerm_resource_group" "resource_group" {
   name     = "test-terraform-deployment"
   location = var.region
 }
 
-# Create a virtual network within the resource group
-resource "azurerm_virtual_network" "myterraformnetwork" {
+# Create a tes virtual network
+resource "azurerm_virtual_network" "network" {
   name                = "test-vnet"
-  resource_group_name = azurerm_resource_group.test.name
-  location            = azurerm_resource_group.test.location
   address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
 }
 
-# Create a subnet within the VNET
-resource "azurerm_subnet" "myterraformsubnet" {
+# Create a test subnet within the test VNET
+resource "azurerm_subnet" "subnet" {
   name                  = "test-subnet"
-  resource_group_name   = azurerm_resource_group.test.name
+  resource_group_name   = azurerm_resource_group.resource_group.name
   virtual_network_name  = "test-vnet"
   address_prefixes      = ["10.0.0.0/16"]
+}
+
+# Create a test NIC for the test VM
+resource "azurerm_network_interface" "nic" {
+  name                = "test-nic"
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
+
+  ip_configuration {
+    name                          = "testconfiguration"
+    subnet_id                     = azurerm_subnet.myterraformsubnet.id
+    private_ip_address_allocation = "Dynamic"
+  }
+}
+
+# Create a test VM using the test NIC
+resource "azurerm_virtual_machine" "vm" {
+  name                  = "test-vm"
+  location              = azurerm_resource_group.resource_group.location
+  resource_group_name   = azurerm_resource_group.resource_group.name
+  network_interface_ids = [azurerm_network_interface.nic.id]
+  vm_size               = "Standard_DS1_v2"
+
+  storage_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "20.04-LTS"
+    version   = "latest"
+  }
+  storage_os_disk {
+    name              = "azureuser"
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+  os_profile {
+    computer_name  = "hostname"
+    admin_username = "testadmin"
+    admin_password = "test1234!"
+  }
+}
+
+# Create a test NSG for the subnet
+resource "azurerm_network_security_group" "nsg" {
+  name                = "test-nsg"
+  location            = azurerm_resource_group.resource_group.location
+  resource_group_name = azurerm_resource_group.resource_group.name
+}
+
+resource "azurerm_network_security_rule" "rule1" {
+  name                        = "test-1"
+  priority                    = 100
+  direction                   = "Outbound"
+  access                      = "Allow"
+  protocol                    = "Tcp"
+  source_port_range           = "*"
+  destination_port_range      = "*"
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = azurerm_resource_group.resource_group.name
+  network_security_group_name = azurerm_network_security_group.resource_group.name
 }
