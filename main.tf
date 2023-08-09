@@ -39,24 +39,20 @@ resource "azurerm_virtual_machine" "vm" {
   location              = azurerm_resource_group.resource_group.location
   resource_group_name   = azurerm_resource_group.resource_group.name
   network_interface_ids = [azurerm_network_interface.nic.id]
-  vm_size               = "Standard_DS1_v2"
+  size                  = "Standard_DS1_v2"
+  admin_username        = "adminuser"
+  admin_password        = "password123!"
 
-  storage_image_reference {
+  source_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
     sku       = "20.04-LTS"
     version   = "latest"
   }
-  storage_os_disk {
-    name              = "azureuser"
-    caching           = "ReadWrite"
-    create_option     = "FromImage"
-    managed_disk_type = "Standard_LRS"
-  }
-  os_profile {
-    computer_name  = "hostname"
-    admin_username = "testadmin"
-    admin_password = "test1234!"
+
+  os_disk {
+    storage_account_type = "Standard_LRS"
+    caching              = "ReadWrite"
   }
 }
 
