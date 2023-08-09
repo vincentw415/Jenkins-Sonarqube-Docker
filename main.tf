@@ -59,7 +59,7 @@ resource "azurerm_virtual_machine" "vm" {
     admin_password = "Password1234!"
   }
   os_profile_windows_config {
-    disable_password_authentication = false
+    provision_vm_agent        = false
   }
 }
 
